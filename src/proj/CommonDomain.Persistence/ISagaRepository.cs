@@ -7,5 +7,8 @@ namespace CommonDomain.Persistence
 	{
 		TSaga GetById<TSaga>(Guid sagaId) where TSaga : class, ISaga, new();
 		void Save(ISaga saga, Guid commitId, Action<IDictionary<string, object>> updateHeaders);
+
+		TSaga GetById<TSaga>( long sagaId ) where TSaga : class, ISaga, new();
+		void Save( ISaga saga, long commitId, Action<IDictionary<string, object>> updateHeaders );
 	}
 }

@@ -5,11 +5,13 @@ namespace CommonDomain
 
 	public interface IAggregate
 	{
-		Guid Id { get; }
+		long Id { get; }
+		Guid Guid { get; }
 		int Version { get; }
 
 		void ApplyEvent(object @event);
-		ICollection GetUncommittedEvents();
+	
+		ICollection GetUncommittedEvents();		
 		void ClearUncommittedEvents();
 
 		IMemento GetSnapshot();

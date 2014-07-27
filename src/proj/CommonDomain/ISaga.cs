@@ -5,7 +5,8 @@ namespace CommonDomain
 
 	public interface ISaga
 	{
-		Guid Id { get; }
+		long Id { get; }
+		Guid Guid { get; }	
 		int Version { get; }
 
 		void Transition(object message);
@@ -13,7 +14,7 @@ namespace CommonDomain
 		ICollection GetUncommittedEvents();
 		void ClearUncommittedEvents();
 
-		ICollection GetUndispatchedMessages();
+		ICollection GetUndispatchedMessages();		
 		void ClearUndispatchedMessages();
 	}
 }

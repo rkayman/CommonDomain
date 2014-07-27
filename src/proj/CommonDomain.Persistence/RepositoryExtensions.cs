@@ -6,7 +6,12 @@ namespace CommonDomain.Persistence
     {
          public static void Save(this IRepository repository, IAggregate aggregate, Guid commitId)
          {
-             repository.Save(aggregate, commitId, a => {});
+	         repository.Save( aggregate, commitId, a => { } );
          }
+
+	    public static void Save( this IRepository repository, IAggregate aggregate, long commitId )
+	    {
+		    repository.Save( aggregate, commitId, a => { } );
+	    }
     }
 }

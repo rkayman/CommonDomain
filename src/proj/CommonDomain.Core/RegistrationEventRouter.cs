@@ -2,6 +2,7 @@ namespace CommonDomain.Core
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 
 	public class RegistrationEventRouter : IRouteEvents
 	{
@@ -10,23 +11,27 @@ namespace CommonDomain.Core
 
 		public virtual void Register<T>(Action<T> handler)
 		{
-			this.handlers[typeof(T)] = @event => handler((T)@event);
+			handlers[typeof(T)] = @event => handler((T)@event);
 		}
 		public virtual void Register(IAggregate aggregate)
 		{
 			if (aggregate == null)
 				throw new ArgumentNullException("aggregate");
 
-			this.regsitered = aggregate;
+			regsitered = aggregate;
 		}
 
 		public virtual void Dispatch(object eventMessage)
 		{
 			Action<object> handler;
 
-			if (!this.handlers.TryGetValue(eventMessage.GetType(), out handler))
-				this.regsitered.ThrowHandlerNotFound(eventMessage);
+			if (!handlers.TryGetValue(eventMessage.GetType(), out handler))
+				regsitered.ThrowHandlerNotFound(eventMessage);
 
+			if (handler == null)
+				regsitered.ThrowHandlerNotFound( eventMessage );
+
+			Debug.Assert( handler != null, "Dispatch handler cannot be null" );
 			handler(eventMessage);
 		}
 	}
