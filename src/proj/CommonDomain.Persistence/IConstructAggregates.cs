@@ -2,8 +2,8 @@ namespace CommonDomain.Persistence
 {
 	using System;
 
-	public interface IConstructAggregates
+	public interface IConstructAggregates<T> where T : struct
 	{
-		IAggregate Build(Type type, Guid id, IMemento snapshot);
+		IAggregate<T> Build( Type type, T id, IMemento<T> snapshot );
 	}
 }

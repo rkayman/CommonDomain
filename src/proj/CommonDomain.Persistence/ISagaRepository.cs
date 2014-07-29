@@ -3,12 +3,11 @@ namespace CommonDomain.Persistence
 	using System;
 	using System.Collections.Generic;
 
-	public interface ISagaRepository
+	public interface ISagaRepository<in T> where T : struct, IEquatable<T>
 	{
-		TSaga GetById<TSaga>(Guid sagaId) where TSaga : class, ISaga, new();
-		void Save(ISaga saga, Guid commitId, Action<IDictionary<string, object>> updateHeaders);
+		TSaga GetById<TSaga>( T sagaId ) where TSaga : class, ISaga<T>, new();
 
-		TSaga GetById<TSaga>( long sagaId ) where TSaga : class, ISaga, new();
-		void Save( ISaga saga, long commitId, Action<IDictionary<string, object>> updateHeaders );
+		void Save<TSaga>( TSaga saga, Guid commitId, Action<IDictionary<string, object>> updateHeaders )
+			where TSaga : class, ISaga<T>;
 	}
 }

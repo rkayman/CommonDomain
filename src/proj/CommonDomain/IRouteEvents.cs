@@ -2,11 +2,12 @@ namespace CommonDomain
 {
 	using System;
 
-	public interface IRouteEvents
+	public interface IRouteEvents<T> where T : struct
 	{
-		void Register<T>(Action<T> handler);
-		void Register(IAggregate aggregate);
+		void Register<TEvent>( Action<TEvent> handler );
 
-		void Dispatch(object eventMessage);
+		void Register( IAggregate<T> aggregate );
+		
+		void Dispatch( object eventMessage );
 	}
 }

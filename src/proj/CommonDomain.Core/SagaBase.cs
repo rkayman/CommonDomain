@@ -4,68 +4,68 @@ namespace CommonDomain.Core
 	using System.Collections;
 	using System.Collections.Generic;
 
-	public class SagaBase<TMessage> : ISaga, IEquatable<ISaga>
+	public class SagaBase<TMessage, TId> : ISaga<TId>, IEquatable<ISaga<TId>>
 		where TMessage : class
+		where TId : struct, IEquatable<TId>
 	{
 		private readonly IDictionary<Type, Action<TMessage>> handlers = new Dictionary<Type, Action<TMessage>>();
 		private readonly ICollection<TMessage> uncommitted = new LinkedList<TMessage>();
 		private readonly ICollection<TMessage> undispatched = new LinkedList<TMessage>();
 
-		public long Id { get; protected set; }
-		public Guid Guid { get; protected set; }
+		public TId Id { get; protected set; }
 		public int Version { get; private set; }
 
-		protected void Register<TRegisteredMessage>(Action<TRegisteredMessage> handler)
+		protected void Register<TRegisteredMessage>( Action<TRegisteredMessage> handler )
 			where TRegisteredMessage : class, TMessage
 		{
-			handlers[typeof(TRegisteredMessage)] = message => handler(message as TRegisteredMessage);
+			handlers[typeof (TRegisteredMessage)] = message => handler( message as TRegisteredMessage );
 		}
 
-		public void Transition(object message)
+		public void Transition( object message )
 		{
-			handlers[message.GetType()](message as TMessage);
-			uncommitted.Add(message as TMessage);
+			handlers[message.GetType()]( message as TMessage );
+			uncommitted.Add( message as TMessage );
 			Version++;
 		}
 
-		ICollection ISaga.GetUncommittedEvents()
+		ICollection ISaga<TId>.GetUncommittedEvents()
 		{
 			return uncommitted as ICollection;
 		}
 
-		void ISaga.ClearUncommittedEvents()
+		void ISaga<TId>.ClearUncommittedEvents()
 		{
 			uncommitted.Clear();
 		}
 
-		protected void Dispatch(TMessage message)
+		protected void Dispatch( TMessage message )
 		{
-			undispatched.Add(message);
+			undispatched.Add( message );
 		}
 
-		ICollection ISaga.GetUndispatchedMessages()
+		ICollection ISaga<TId>.GetUndispatchedMessages()
 		{
 			return undispatched as ICollection;
 		}
 
-		void ISaga.ClearUndispatchedMessages()
+		void ISaga<TId>.ClearUndispatchedMessages()
 		{
 			undispatched.Clear();
 		}
 
 		public override int GetHashCode()
 		{
-			return Guid.GetHashCode();
+			return Id.GetHashCode();
 		}
 
-		public override bool Equals(object obj)
+		public override bool Equals( object obj )
 		{
-			return Equals(obj as ISaga);
+			return Equals( obj as ISaga<TId> );
 		}
 
-		public virtual bool Equals(ISaga other)
+		public virtual bool Equals( ISaga<TId> other )
 		{
-			return null != other && other.Id == Id;
+			return null != other && Id.Equals( other.Id );
 		}
 	}
 }

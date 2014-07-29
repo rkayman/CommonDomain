@@ -1,19 +1,18 @@
 namespace CommonDomain
 {
-	using System;
 	using System.Collections;
 
-	public interface IAggregate
+	public interface IAggregate<T> where T : struct
 	{
-		long Id { get; }
-		Guid Guid { get; }
+		T Id { get; }
 		int Version { get; }
 
-		void ApplyEvent(object @event);
-	
-		ICollection GetUncommittedEvents();		
+		void ApplyEvent( object @event );
+
+		ICollection GetUncommittedEvents();
+
 		void ClearUncommittedEvents();
 
-		IMemento GetSnapshot();
+		IMemento<T> GetSnapshot();
 	}
 }

@@ -2,37 +2,37 @@ namespace CommonDomain.Core
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Diagnostics;
 
-	public class RegistrationEventRouter : IRouteEvents
+	public class RegistrationEventRouter<T> : IRouteEvents<T>
+		where T : struct
 	{
 		private readonly IDictionary<Type, Action<object>> handlers = new Dictionary<Type, Action<object>>();
-		private IAggregate regsitered;
+		private IAggregate<T> registered;
 
-		public virtual void Register<T>(Action<T> handler)
+		public virtual void Register<TEvent>( Action<TEvent> handler )
 		{
-			handlers[typeof(T)] = @event => handler((T)@event);
+			handlers[typeof( TEvent )] = @event => handler( (TEvent)@event );
 		}
-		public virtual void Register(IAggregate aggregate)
+
+		public virtual void Register( IAggregate<T> aggregate )
 		{
 			if (aggregate == null)
-				throw new ArgumentNullException("aggregate");
+				throw new ArgumentNullException( "aggregate" );
 
-			regsitered = aggregate;
+			registered = aggregate;
 		}
 
-		public virtual void Dispatch(object eventMessage)
+		public virtual void Dispatch( object eventMessage )
 		{
+			if (eventMessage == null)
+				throw new ArgumentNullException( "eventMessage" );
+
 			Action<object> handler;
 
-			if (!handlers.TryGetValue(eventMessage.GetType(), out handler))
-				regsitered.ThrowHandlerNotFound(eventMessage);
+			if (handlers.TryGetValue( eventMessage.GetType(), out handler ))
+				handler( eventMessage );
 
-			if (handler == null)
-				regsitered.ThrowHandlerNotFound( eventMessage );
-
-			Debug.Assert( handler != null, "Dispatch handler cannot be null" );
-			handler(eventMessage);
+			registered.ThrowHandlerNotFound( eventMessage );
 		}
 	}
 }

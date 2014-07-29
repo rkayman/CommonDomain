@@ -2,10 +2,9 @@ namespace CommonDomain
 {
 	using System;
 
-	public interface IMemento
+	public interface IMemento<T> where T : struct
 	{
-		long Id { get; set; }
-		Guid Guid { get; set; }
+		T Id { get; set; }
 		int Version { get; set; }
 	}
 }

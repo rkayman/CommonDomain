@@ -20,8 +20,8 @@ namespace CommonDomain.Persistence
 		/// Initializes a new instance of the PersistenceException class.
 		/// </summary>
 		/// <param name="message">The message that describes the error.</param>
-		public PersistenceException(string message)
-			: base(message)
+		public PersistenceException( string message )
+			: base( message )
 		{
 		}
 
@@ -30,8 +30,8 @@ namespace CommonDomain.Persistence
 		/// </summary>
 		/// <param name="message">The message that describes the error.</param>
 		/// <param name="innerException">The message that is the cause of the current exception.</param>
-		public PersistenceException(string message, Exception innerException)
-			: base(message, innerException)
+		public PersistenceException( string message, Exception innerException )
+			: base( message, innerException )
 		{
 		}
 
@@ -40,8 +40,8 @@ namespace CommonDomain.Persistence
 		/// </summary>
 		/// <param name="info">The SerializationInfo that holds the serialized object data of the exception being thrown.</param>
 		/// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-		protected PersistenceException(SerializationInfo info, StreamingContext context)
-			: base(info, context)
+		protected PersistenceException( SerializationInfo info, StreamingContext context )
+			: base( info, context )
 		{
 		}
 	}

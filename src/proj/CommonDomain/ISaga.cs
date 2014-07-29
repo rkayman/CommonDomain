@@ -3,18 +3,17 @@ namespace CommonDomain
 	using System;
 	using System.Collections;
 
-	public interface ISaga
+	public interface ISaga<out T> where T : struct, IEquatable<T>
 	{
-		long Id { get; }
-		Guid Guid { get; }	
+		T Id { get; }
 		int Version { get; }
 
-		void Transition(object message);
+		void Transition( object message );
 
 		ICollection GetUncommittedEvents();
 		void ClearUncommittedEvents();
 
-		ICollection GetUndispatchedMessages();		
+		ICollection GetUndispatchedMessages();
 		void ClearUndispatchedMessages();
 	}
 }
