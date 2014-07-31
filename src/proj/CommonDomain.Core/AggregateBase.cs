@@ -53,7 +53,7 @@ namespace CommonDomain.Core
 		void IAggregate<T>.ApplyEvent( object @event )
 		{
 			RegisteredRoutes.Dispatch( @event );
-			Version++;
+			@Version++;
 		}
 
 		ICollection IAggregate<T>.GetUncommittedEvents()
