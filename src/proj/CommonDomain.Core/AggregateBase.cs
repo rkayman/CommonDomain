@@ -8,40 +8,63 @@ namespace CommonDomain.Core
 	{
 		private readonly ICollection<object> uncommittedEvents = new LinkedList<object>();
 
-		private IRouteEvents<T> registeredRoutes;
+		private IRouteMessages<T> registeredEvents;
+		private IRouteMessages<T> registeredCommands; 
 
-		protected AggregateBase() : this( null ) { }
+		protected AggregateBase() : this( null, null ) { }
 
-		protected AggregateBase( IRouteEvents<T> handler )
+		protected AggregateBase(IRouteMessages<T> events, IRouteMessages<T> commands)
 		{
-			if (handler == null)
-				return;
+			RegisterEvents(events);
+			RegisterCommands(commands);
+		}
 
-			RegisteredRoutes = handler;
-			RegisteredRoutes.Register( this );
+		private void RegisterEvents(IRouteMessages<T> events)
+		{
+			if (events == null) return;
+
+			RegisteredEvents = events;
+			RegisteredEvents.Register(this);
+		}
+
+		private void RegisterCommands(IRouteMessages<T> commands)
+		{
+			if (commands == null) return;
+
+			RegisteredCommands = commands;
+			RegisteredCommands.Register(this);
 		}
 
 		public T Id { get; protected set; }
 		public int Version { get; protected set; }
 
-		protected IRouteEvents<T> RegisteredRoutes
+		protected IRouteMessages<T> RegisteredEvents
 		{
-			get
-			{
-				return registeredRoutes ?? (registeredRoutes = new ConventionEventRouter<T>( true, this ));
-			}
+			get { return registeredEvents ?? (registeredEvents = new ConventionMessageRouter<T>(true, this)); }
 			set
 			{
 				if (value == null)
 					throw new InvalidOperationException( "AggregateBase must have an event router to function" );
 
-				registeredRoutes = value;
+				registeredEvents = value;
 			}
 		}
 
-		protected void Register<TEvent>( Action<TEvent> route )
+		protected IRouteMessages<T> RegisteredCommands
 		{
-			RegisteredRoutes.Register( route );
+			get { return registeredCommands ?? (registeredCommands = new ConventionMessageRouter<T>(true, this)); }
+			set
+			{
+				if (value == null)
+					throw new InvalidOperationException("AggregateBase must have a command router to function");
+
+				registeredCommands = value;
+			}
+		}
+
+		protected void RegisterEvent<TMessage>(Action<TMessage> route)
+		{
+			RegisteredEvents.Register(route);
 		}
 
 		protected void RaiseEvent( object @event )
@@ -52,8 +75,18 @@ namespace CommonDomain.Core
 
 		void IAggregate<T>.ApplyEvent( object @event )
 		{
-			RegisteredRoutes.Dispatch( @event );
+			RegisteredEvents.Dispatch( @event );
 			@Version++;
+		}
+
+		protected void RegisterCommand<TMessage>(Action<TMessage> route)
+		{
+			RegisteredCommands.Register(route);
+		}
+
+		public virtual void DoCommand(object command)
+		{
+			RegisteredCommands.Dispatch(command);
 		}
 
 		ICollection IAggregate<T>.GetUncommittedEvents()
